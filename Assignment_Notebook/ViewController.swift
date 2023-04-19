@@ -8,7 +8,7 @@
 import UIKit
 
 class ViewController: UIViewController , UITableViewDataSource , UITableViewDelegate {
-    var assignments : [String] = []
+    var assignments : [String] = ["Fix App"]
     @IBOutlet weak var assignmentTable: UITableView!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,9 +30,13 @@ class ViewController: UIViewController , UITableViewDataSource , UITableViewDele
     @IBAction func whenAdded(_ sender: Any) {
         let alert = UIAlertController(title: "Add Task", message: "Add your task below", preferredStyle: .alert)
         alert.addTextField()
-        var task = (alert.textFields?[0].text)!
-        let add = UIAlertAction(title: "Add", style: .default, handler: {action in self.assignments.append(task)
+        func insert(){
+            var task = (alert.textFields?[0].text)!
+            self.assignments.append("\(task)")
             self.assignmentTable.reloadData()
+        }
+        let add = UIAlertAction(title: "Add", style: .default, handler: {action in
+            insert()
         })
         let cancel = UIAlertAction(title: "Cancel", style: .cancel)
         alert.addAction(add)
@@ -40,6 +44,12 @@ class ViewController: UIViewController , UITableViewDataSource , UITableViewDele
         present(alert, animated: true)
     }
     
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete{
+            assignments.remove(at: indexPath.row)
+            assignmentTable.reloadData()
+        }
+    }
 
 }
 
