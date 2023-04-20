@@ -8,8 +8,10 @@
 import UIKit
 
 class ViewController: UIViewController , UITableViewDataSource , UITableViewDelegate {
-    var assignments : [String] = ["Fix App"]
     @IBOutlet weak var assignmentTable: UITableView!
+    var task1 = Task(name:"Wash Dishes", details: "Don't forget to dry them")
+    var task2 = Task(name : "Clean Desk", details : "Put the books away")
+    var assignments : [Task] = [task1, task2]
     override func viewDidLoad() {
         super.viewDidLoad()
         assignmentTable.dataSource = self
@@ -22,7 +24,7 @@ class ViewController: UIViewController , UITableViewDataSource , UITableViewDele
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = assignmentTable.dequeueReusableCell(withIdentifier: "myCell", for: indexPath)
         var content = cell.defaultContentConfiguration()
-        content.text = assignments[indexPath.row]
+        content.text = assignments[indexPath.row].name
         cell.contentConfiguration = content
         return cell
     }
@@ -30,10 +32,17 @@ class ViewController: UIViewController , UITableViewDataSource , UITableViewDele
     @IBAction func whenAdded(_ sender: Any) {
         let alert = UIAlertController(title: "Add Task", message: "Add your task below", preferredStyle: .alert)
         alert.addTextField()
+        alert.addTextField()
         func insert(){
-            var task = (alert.textFields?[0].text)!
-            self.assignments.append("\(task)")
-            self.assignmentTable.reloadData()
+            if alert.textFields?[0].text! != "" {
+                let task = (alert.textFields?[0].text)!
+                let describe = (alert.textFields?[1].text)
+                var newTask = Task(name: task, details: describe ?? "")
+                self.assignments.append(newTask)
+                self.assignmentTable.reloadData()
+            } else {
+                return
+            }
         }
         let add = UIAlertAction(title: "Add", style: .default, handler: {action in
             insert()
@@ -48,6 +57,17 @@ class ViewController: UIViewController , UITableViewDataSource , UITableViewDele
         if editingStyle == .delete{
             assignments.remove(at: indexPath.row)
             assignmentTable.reloadData()
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        var segue = UIStoryboardSegue(identifier: "Segue", source: ViewController(), destination: DetailsViewController())
+        prepare(for: segue, sender: self)
+        if segue.identifier == "Segue"{
+            guard let nvc = segue.destination as? DetailsViewController else {return}
+            nvc.name = assignments[indexPath.row].name
+            nvc.describe = assignments[indexPath.row].details
+            performSegue(withIdentifier: "Segue", sender: self)
         }
     }
 
