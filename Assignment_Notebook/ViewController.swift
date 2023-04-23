@@ -9,14 +9,18 @@ import UIKit
 
 class ViewController: UIViewController , UITableViewDataSource , UITableViewDelegate {
     @IBOutlet weak var assignmentTable: UITableView!
-    var task1 = Task(name:"Wash Dishes", details: "Don't forget to dry them")
-    var task2 = Task(name : "Clean Desk", details : "Put the books away")
-    var assignments : [Task] = [task1, task2]
+    var assignments : [Task] = []
     override func viewDidLoad() {
         super.viewDidLoad()
         assignmentTable.dataSource = self
         assignmentTable.delegate = self
+        let alert = UIAlertController(title: "Add a task to begin", message: "Click the '+' in the top right corner", preferredStyle: .alert)
+        let ok = UIAlertAction(title: "OK", style: .cancel)
+        alert.addAction(ok)
+        present(alert, animated: true)
     }
+    
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return assignments.count
     }
@@ -33,6 +37,8 @@ class ViewController: UIViewController , UITableViewDataSource , UITableViewDele
         let alert = UIAlertController(title: "Add Task", message: "Add your task below", preferredStyle: .alert)
         alert.addTextField()
         alert.addTextField()
+        alert.textFields?[0].placeholder = "Task name here..."
+        alert.textFields?[1].placeholder = "Task details here..."
         func insert(){
             if alert.textFields?[0].text! != "" {
                 let task = (alert.textFields?[0].text)!
@@ -61,15 +67,26 @@ class ViewController: UIViewController , UITableViewDataSource , UITableViewDele
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        var segue = UIStoryboardSegue(identifier: "Segue", source: ViewController(), destination: DetailsViewController())
-        prepare(for: segue, sender: self)
+        let cell = indexPath.row
+        self.performSegue(withIdentifier: "Segue", sender: cell)
+//        if let nvc = segue.destination as? DetailsViewController {
+//            print("success")
+//            nvc.name = assignments[indexPath.row].name
+//            nvc.describe = assignments[indexPath.row].details
+//            performSegue(withIdentifier: "Segue", sender: self)
+//        }
+        }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "Segue"{
-            guard let nvc = segue.destination as? DetailsViewController else {return}
-            nvc.name = assignments[indexPath.row].name
-            nvc.describe = assignments[indexPath.row].details
-            performSegue(withIdentifier: "Segue", sender: self)
+            print("success")
+            var row = assignmentTable.indexPathForSelectedRow
+            let nvc = segue.destination as! DetailsViewController
+            nvc.name = assignments[row?.row ?? 0].name
+            nvc.describe = assignments[row?.row ?? 0].details
         }
     }
-
+    
 }
+
 
